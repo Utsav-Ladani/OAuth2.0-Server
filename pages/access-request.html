@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access request</title>
+</head>
+<body>
+    <h1>Access Request</h1>
+    <p><strong>{{client_name}}</strong> wants to access your <strong>{{access_scope}}</strong></p>
+    <form action="{{form_action}}" method="POST">
+        <p>Allow access?</p>
+        <button type="submit" name="access" value="granted">Yes</button>
+        <button type="submit" name="access" value="denied">No</button>
+    </form>
+</body>
+</html>

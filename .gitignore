@@ -1,0 +1,7 @@
+.DS_Store
+.env
+.pnp.cjs
+.pnp.loader.mjs
+.yarn
+data.json
+data
