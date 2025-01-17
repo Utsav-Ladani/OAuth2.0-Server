@@ -12,24 +12,36 @@ const handleAuthRequest = async (req, res) => {
     const { response_type, client_id, redirect_uri, scope, state } = req.query
 
     if (response_type !== 'code') {
-        res.status(400).json({ error: "Invalid OAuth response type" })
+        redirectWithQueryParams(res, redirect_uri, {
+            error: 'unsupported_response_type',
+            error_description: 'Unsupported OAuth response type'
+        })
         return
     }
 
     const client = oAuthClientDB.find(client_id)
 
     if (!client) {
-        res.status(403).json({ error: "Client not found" })
+        redirectWithQueryParams(res, redirect_uri, {
+            error: 'access_denied',
+            error_description: 'Client not found'
+        })
         return
     }
 
     if (client?.redirect_uri !== redirect_uri) {
-        res.status(403).json({ error: "Invalid redirect URI" })
+        redirectWithQueryParams(res, redirect_uri, {
+            error: 'invalid_request',
+            error_description: 'Invalid redirect URI'
+        })
         return
     }
 
     if (!VALID_SCOPE.includes(scope)) {
-        res.status(403).json({ error: "Invalid access scope" })
+        redirectWithQueryParams(res, redirect_uri, {
+            error: 'invalid_scope',
+            error_description: 'Invalid access scope'
+        })
         return
     }
 
@@ -42,23 +54,27 @@ const handleAuthRequest = async (req, res) => {
                 form_action: req.originalUrl
             }
         ))
-    } else if (req.method === 'POST') {
-        const { access } = req.body ?? {}
+        return
+    }
 
-        const redirectURLObj = new URL(client.redirect_uri)
+    if (req.method === 'POST') {
+        const { access } = req.body ?? {}
 
         if (access === 'granted') {
             const authorization_code = generateAuthorizationCode(req.user.id, client.id, scope)
-            redirectURLObj.searchParams.set('code', authorization_code)
-            redirectURLObj.searchParams.set('state', state)
+            redirectWithQueryParams(res, redirect_uri, {
+                code: authorization_code,
+                state
+            })
         } else {
-            redirectURLObj.searchParams.set('error', 'access_denied')
+            redirectWithQueryParams(res, redirect_uri, {
+                error: 'access_denied'
+            })
         }
-
-        res.redirect(redirectURLObj.toString())
-    } else {
-        res.end('N/A')
+        return
     }
+
+    res.end('N/A')
 }
 
 const handleTokenRequest = async (req, res) => {
@@ -101,6 +117,16 @@ const generateAuthorizationCode = (user_id, client_id, scope) => {
 
 const getDataFromAuthorizationCode = (code = '') => {
     return jwt.verify(code, authCodeSecretKey);
+}
+
+const redirectWithQueryParams = (res, redirectUrl, params = {}) => {
+    const redirectURLObj = new URL(redirectUrl)
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+            redirectURLObj.searchParams.set(key, value)
+        }
+    })
+    res.redirect(redirectURLObj.toString())
 }
 
 export { handleAuthRequest, handleTokenRequest }
