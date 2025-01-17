@@ -38,7 +38,11 @@ const getResourceAccessToken = (user_id, client_id, scope) => {
 }
 
 const getDataFromAccessToken = (token = '') => {
-    return jwt.verify(token, accessTokenSecretKey);
+    try {
+        return jwt.verify(token, accessTokenSecretKey);
+    } catch (err) {
+        return {}
+    }
 }
 
 const handleResourcesRequest = (req, res) => {

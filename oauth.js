@@ -68,7 +68,8 @@ const handleAuthRequest = async (req, res) => {
             })
         } else {
             redirectWithQueryParams(res, redirect_uri, {
-                error: 'access_denied'
+                error: 'access_denied',
+                error_description: 'Access denied'
             })
         }
         return
@@ -116,7 +117,11 @@ const generateAuthorizationCode = (user_id, client_id, scope) => {
 }
 
 const getDataFromAuthorizationCode = (code = '') => {
-    return jwt.verify(code, authCodeSecretKey);
+    try {
+        return jwt.verify(code, authCodeSecretKey);
+    } catch (err) {
+        return {}
+    }
 }
 
 const redirectWithQueryParams = (res, redirectUrl, params = {}) => {
