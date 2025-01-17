@@ -45,16 +45,15 @@ const handleAuthRequest = async (req, res) => {
     } else if (req.method === 'POST') {
         const { access } = req.body ?? {}
 
-        if(access !== 'granted') {
-            res.redirect(client.redirect_uri)
-            return
-        }
-        
-        const authorization_code = generateAuthorizationCode(req.user.id, client.id, scope)
-
         const redirectURLObj = new URL(client.redirect_uri)
-        redirectURLObj.searchParams.set('code', authorization_code)
-        redirectURLObj.searchParams.set('state', state)
+
+        if (access === 'granted') {
+            const authorization_code = generateAuthorizationCode(req.user.id, client.id, scope)
+            redirectURLObj.searchParams.set('code', authorization_code)
+            redirectURLObj.searchParams.set('state', state)
+        } else {
+            redirectURLObj.searchParams.set('error', 'access_denied')
+        }
 
         res.redirect(redirectURLObj.toString())
     } else {
@@ -91,7 +90,7 @@ const handleTokenRequest = async (req, res) => {
     }
 
     res.json({
-        token: getResourceAccessToken(user_id, client_id, scope)
+        access_token: getResourceAccessToken(user_id, client_id, scope),
     })
 }
 
