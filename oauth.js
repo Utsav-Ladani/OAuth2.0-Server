@@ -62,9 +62,10 @@ const handleAuthRequest = async (req, res) => {
 }
 
 const handleTokenRequest = async (req, res) => {
-    // /token?grant_type=authorization_code&code=CODE&redirect_uri=http://localhost:3211/callback&client_id=power-tool&client_secret=ok
+    // POST /token
+    // grant_type=authorization_code&code=CODE&redirect_uri=http://localhost:3211/callback&client_id=power-tool&client_secret=ok
 
-    const { grant_type, code, client_id, client_secret, redirect_uri } = req.query
+    const { grant_type, code, client_id, client_secret, redirect_uri } = req.body || {}
 
     if (grant_type !== 'authorization_code') {
         res.status(400).json({ error: "Invalid grant type" })
@@ -76,7 +77,7 @@ const handleTokenRequest = async (req, res) => {
         return
     }
 
-    const {user_id, client_id: client_id_from_code, scope} = getDataFromAuthorizationCode(code)
+    const { user_id, client_id: client_id_from_code, scope } = getDataFromAuthorizationCode(code)
     const client = oAuthClientDB.find(client_id_from_code)
 
     if (client?.id !== client_id) {
