@@ -1,5 +1,4 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { handleProfileRequest, handleSignInRequest, handleSignUpRequest, mustBeAuthenticated } from './users.js';
 import { handleHomePageRequest, handleSignInPageRequest, handleSignUpPageRequest } from './pages/index.js';
@@ -8,7 +7,8 @@ import { handleResourcesRequest, mustHaveAccess } from './resource.js';
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get('/', handleHomePageRequest)

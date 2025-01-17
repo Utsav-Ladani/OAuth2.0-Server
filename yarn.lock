@@ -187,7 +187,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"body-parser@npm:1.20.3, body-parser@npm:^1.20.3":
+"body-parser@npm:1.20.3":
   version: 1.20.3
   resolution: "body-parser@npm:1.20.3"
   dependencies:
@@ -1386,7 +1386,6 @@ __metadata:
   resolution: "oauth2.0-server@workspace:."
   dependencies:
     bcrypt: "npm:^5.1.1"
-    body-parser: "npm:^1.20.3"
     cookie-parser: "npm:^1.4.7"
     dotenv: "npm:^16.4.7"
     express: "npm:^4.21.2"
